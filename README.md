@@ -1,16 +1,26 @@
-# agendaflutter
+# 📒 Agenda de Contatos - Flutter
 
-A new Flutter project.
+Um app de agenda simples e eficiente para gerenciar contatos (nome, telefone, e-mail), desenvolvido com Flutter. Ele permite listar, adicionar, editar e excluir contatos, além de realizar validações e armazenar dados localmente.
 
-## Getting Started
 
-This project is a starting point for a Flutter application.
 
-A few resources to get you started if this is your first Flutter project:
+## ✨ Funcionalidades
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+**Listagem de Contatos:** Mostra todos os contatos com nome, telefone e e-mail.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+**Cadastro e Edição:** Adicione ou edite contatos com campos validados.
+
+**Remoção:** Exclua contatos da lista facilmente.
+
+**Validações:** Nome, telefone e e-mail são validados, com máscara de formatação no telefone.
+
+
+## 🛠️ Tecnologias Usadas
+
+**Flutter:** Framework para o desenvolvimento do app. 
+
+**Dart:** Linguagem de programação usada pelo Flutter.
+
+**Armazenamento Local:** Persistência de dados em memória.
+
+**Material Design:** Para o layout responsivo e visual do aplicativo.
