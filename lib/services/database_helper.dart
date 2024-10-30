@@ -1,16 +1,17 @@
-import 'package:sqflite/sqflite.dart';
+import 'dart:async';
 import 'package:path/path.dart';
+import 'package:sqflite/sqflite.dart';
 import '../models/contact.dart';
 
 class DatabaseHelper {
-  static final DatabaseHelper _instance = DatabaseHelper._();
+  static final DatabaseHelper _instance = DatabaseHelper._internal();
   static Database? _database;
-
-  DatabaseHelper._();
 
   factory DatabaseHelper() {
     return _instance;
   }
+
+  DatabaseHelper._internal();
 
   Future<Database> get database async {
     if (_database != null) return _database!;
@@ -19,17 +20,22 @@ class DatabaseHelper {
   }
 
   Future<Database> _initDatabase() async {
-    final path = join(await getDatabasesPath(), 'agenda.db');
+    final dbPath = await getDatabasesPath();
+    final path = join(dbPath, 'agenda.db');
+
     return await openDatabase(
       path,
       version: 1,
-      onCreate: _createDB,
+      onCreate: (db, version) async {
+        await createContactTable(db);
+        await createLoginTable(db);
+      },
     );
   }
 
-  Future<void> _createDB(Database db, int version) async {
+  Future<void> createContactTable(Database db) async {
     await db.execute('''
-      CREATE TABLE contacts(
+      CREATE TABLE contacts (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
         phone TEXT NOT NULL,
@@ -38,17 +44,35 @@ class DatabaseHelper {
     ''');
   }
 
-  // Métodos de CRUD (Create, Read, Update, Delete)
-  Future<int> addContact(Contact contact) async {
-    final db = await database;
-    return await db.insert('contacts', contact.toMap());
+  Future<void> createLoginTable(Database db) async {
+    await db.execute('''
+      CREATE TABLE login (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT NOT NULL UNIQUE,
+        password TEXT NOT NULL
+      )
+    ''');
   }
 
-  Future<List<Contact>> fetchContacts() async {
+  Future<int> addContact(Contact contact) async {
     final db = await database;
-    final maps = await db.query('contacts');
+    return await db.insert('contacts', {
+      'name': contact.name,
+      'phone': contact.phone,
+      'email': contact.email,
+    });
+  }
+
+  Future<List<Contact>> getContacts() async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query('contacts');
+
     return List.generate(maps.length, (i) {
-      return Contact.fromMap(maps[i]);
+      return Contact(
+        name: maps[i]['name'],
+        phone: maps[i]['phone'],
+        email: maps[i]['email'],
+      );
     });
   }
 
@@ -56,9 +80,13 @@ class DatabaseHelper {
     final db = await database;
     return await db.update(
       'contacts',
-      contact.toMap(),
+      {
+        'name': contact.name,
+        'phone': contact.phone,
+        'email': contact.email,
+      },
       where: 'id = ?',
-      whereArgs: [contact.id],
+      whereArgs: [contact.name], 
     );
   }
 
@@ -69,5 +97,30 @@ class DatabaseHelper {
       where: 'id = ?',
       whereArgs: [id],
     );
+  }
+
+  Future<void> addUser(String username, String password) async {
+    final db = await database;
+    await db.insert('login', {
+      'username': username,
+      'password': password,
+    });
+  }
+
+  Future<Map<String, dynamic>?> getUser(String username, String password) async {
+    final db = await database;
+    final result = await db.query(
+      'login',
+      where: 'username = ? AND password = ?',
+      whereArgs: [username, password],
+    );
+    return result.isNotEmpty ? result.first : null;
+  }
+
+  Future<void> close() async {
+    final db = _database;
+    if (db != null && db.isOpen) {
+      await db.close();
+    }
   }
 }

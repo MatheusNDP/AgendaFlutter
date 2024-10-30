@@ -1,9 +1,11 @@
 import 'package:agendaflutter/models/contact.dart';
 import 'package:flutter/material.dart';
 import 'contact_form_screen.dart';
-import '../services/database_helper.dart'; // Importa o DatabaseHelper
+import '../services/database_helper.dart';
 
 class ContactListScreen extends StatefulWidget {
+  const ContactListScreen({super.key});
+
   @override
   _ContactListScreenState createState() => _ContactListScreenState();
 }
@@ -14,7 +16,7 @@ class _ContactListScreenState extends State<ContactListScreen> {
   @override
   void initState() {
     super.initState();
-    _loadContacts(); // Carrega os contatos do banco de dados ao iniciar
+    _loadContacts(); 
   }
 
   Future<void> _loadContacts() async {
@@ -29,22 +31,22 @@ class _ContactListScreenState extends State<ContactListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Lista de Contatos'),
+        title: const Text('Lista de Contatos'),
       ),
       body: contacts.isEmpty
-          ? Center(
+          ? const Center(
               child: Text(
                 'Nenhum contato encontrado',
                 style: TextStyle(fontSize: 18, color: Colors.grey),
               ),
             )
           : ListView.builder(
-              padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+              padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
               itemCount: contacts.length,
               itemBuilder: (context, index) {
                 final contact = contacts[index];
                 return Card(
-                  margin: EdgeInsets.symmetric(vertical: 10),
+                  margin: const EdgeInsets.symmetric(vertical: 10),
                   child: ListTile(
                     title: Text(contact.name),
                     subtitle: Column(
@@ -61,7 +63,7 @@ class _ContactListScreenState extends State<ContactListScreen> {
             ),
       floatingActionButton: FloatingActionButton(
         onPressed: _addContact,
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add),
       ),
     );
   }
@@ -72,8 +74,8 @@ class _ContactListScreenState extends State<ContactListScreen> {
         builder: (context) => ContactFormScreen(
           onSave: (contact) async {
             final dbHelper = DatabaseHelper();
-            await dbHelper.addContact(contact); // Salva o contato no banco de dados
-            _loadContacts(); // Atualiza a lista de contatos
+            await dbHelper.addContact(contact); 
+            _loadContacts(); 
           },
         ),
       ),
@@ -87,13 +89,13 @@ class _ContactListScreenState extends State<ContactListScreen> {
           contact: contact,
           onSave: (updatedContact) async {
             final dbHelper = DatabaseHelper();
-            await dbHelper.updateContact(updatedContact); // Atualiza o contato no banco de dados
-            _loadContacts(); // Atualiza a lista de contatos
+            await dbHelper.updateContact(updatedContact); 
+            _loadContacts(); 
           },
           onDelete: () async {
             final dbHelper = DatabaseHelper();
-            await dbHelper.deleteContact(contact.id!); // Remove o contato do banco de dados
-            _loadContacts(); // Atualiza a lista de contatos
+            await dbHelper.deleteContact(contact.id!); s
+            _loadContacts(); 
             Navigator.of(context).pop();
           },
         ),

@@ -6,7 +6,7 @@ class ContactFormScreen extends StatefulWidget {
   final Function(Contact) onSave;
   final VoidCallback? onDelete;
 
-  ContactFormScreen({this.contact, required this.onSave, this.onDelete});
+  const ContactFormScreen({super.key, this.contact, required this.onSave, this.onDelete});
 
   @override
   _ContactFormScreenState createState() => _ContactFormScreenState();
@@ -40,20 +40,20 @@ class _ContactFormScreenState extends State<ContactFormScreen> {
         actions: [
           if (widget.onDelete != null)
             IconButton(
-              icon: Icon(Icons.delete),
+              icon: const Icon(Icons.delete),
               onPressed: widget.onDelete,
             ),
         ],
       ),
       body: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
           child: Column(
             children: [
               TextFormField(
                 initialValue: _name,
-                decoration: InputDecoration(labelText: 'Nome'),
+                decoration: const InputDecoration(labelText: 'Nome'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Nome é obrigatório';
@@ -64,7 +64,7 @@ class _ContactFormScreenState extends State<ContactFormScreen> {
               ),
               TextFormField(
                 initialValue: _phone,
-                decoration: InputDecoration(labelText: 'Telefone'),
+                decoration: const InputDecoration(labelText: 'Telefone'),
                 keyboardType: TextInputType.phone,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -79,7 +79,7 @@ class _ContactFormScreenState extends State<ContactFormScreen> {
               ),
               TextFormField(
                 initialValue: _email,
-                decoration: InputDecoration(labelText: 'E-mail'),
+                decoration: const InputDecoration(labelText: 'E-mail'),
                 keyboardType: TextInputType.emailAddress,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -92,10 +92,10 @@ class _ContactFormScreenState extends State<ContactFormScreen> {
                 },
                 onSaved: (value) => _email = value!,
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _submitForm,
-                child: Text('Salvar'),
+                child: const Text('Salvar'),
               ),
             ],
           ),
