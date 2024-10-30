@@ -1,6 +1,7 @@
 import 'package:agendaflutter/models/contact.dart';
 import 'package:flutter/material.dart';
 import 'contact_form_screen.dart';
+import '../services/database_helper.dart'; // Importa o DatabaseHelper
 
 class ContactListScreen extends StatefulWidget {
   @override
@@ -11,25 +12,39 @@ class _ContactListScreenState extends State<ContactListScreen> {
   List<Contact> contacts = [];
 
   @override
+  void initState() {
+    super.initState();
+    _loadContacts(); // Carrega os contatos do banco de dados ao iniciar
+  }
+
+  Future<void> _loadContacts() async {
+    final dbHelper = DatabaseHelper();
+    final contactList = await dbHelper.fetchContacts();
+    setState(() {
+      contacts = contactList;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Lista de Contatos'),
       ),
       body: contacts.isEmpty
-          ? Center(  
+          ? Center(
               child: Text(
                 'Nenhum contato encontrado',
                 style: TextStyle(fontSize: 18, color: Colors.grey),
               ),
             )
           : ListView.builder(
-              padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),  
+              padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
               itemCount: contacts.length,
               itemBuilder: (context, index) {
                 final contact = contacts[index];
                 return Card(
-                  margin: EdgeInsets.symmetric(vertical: 10),  
+                  margin: EdgeInsets.symmetric(vertical: 10),
                   child: ListTile(
                     title: Text(contact.name),
                     subtitle: Column(
@@ -55,10 +70,10 @@ class _ContactListScreenState extends State<ContactListScreen> {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => ContactFormScreen(
-          onSave: (contact) {
-            setState(() {
-              contacts.add(contact);
-            });
+          onSave: (contact) async {
+            final dbHelper = DatabaseHelper();
+            await dbHelper.addContact(contact); // Salva o contato no banco de dados
+            _loadContacts(); // Atualiza a lista de contatos
           },
         ),
       ),
@@ -70,16 +85,15 @@ class _ContactListScreenState extends State<ContactListScreen> {
       MaterialPageRoute(
         builder: (context) => ContactFormScreen(
           contact: contact,
-          onSave: (updatedContact) {
-            setState(() {
-              final index = contacts.indexOf(contact);
-              contacts[index] = updatedContact;
-            });
+          onSave: (updatedContact) async {
+            final dbHelper = DatabaseHelper();
+            await dbHelper.updateContact(updatedContact); // Atualiza o contato no banco de dados
+            _loadContacts(); // Atualiza a lista de contatos
           },
-          onDelete: () {
-            setState(() {
-              contacts.remove(contact);
-            });
+          onDelete: () async {
+            final dbHelper = DatabaseHelper();
+            await dbHelper.deleteContact(contact.id!); // Remove o contato do banco de dados
+            _loadContacts(); // Atualiza a lista de contatos
             Navigator.of(context).pop();
           },
         ),
