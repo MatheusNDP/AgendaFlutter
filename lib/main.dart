@@ -1,26 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'screens/login_screen.dart';
 import 'screens/contact_list_screen.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final prefs = await SharedPreferences.getInstance();
-  final userToken = prefs.getString('userToken');
+  final storage = FlutterSecureStorage();
+  final sessionToken = await storage.read(key: 'session_token');
 
-  runApp(AgendaApp(startScreen: userToken == null ? LoginScreen() : ContactListScreen()));
+  runApp(MyApp(sessionToken: sessionToken));
 }
 
-class AgendaApp extends StatelessWidget {
-  final Widget startScreen;
+class MyApp extends StatelessWidget {
+  final String? sessionToken;
 
-  const AgendaApp({super.key, required this.startScreen});
+  MyApp({required this.sessionToken});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Agenda',
+      title: 'Agenda Flutter',
       theme: ThemeData(
         primaryColor: const Color(0xFFF0B90B),
         hintColor: const Color(0xFFF0B90B),
@@ -63,7 +64,7 @@ class AgendaApp extends StatelessWidget {
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
       ),
-      home: startScreen,
+      home: sessionToken != null ? ContactListScreen() : LoginScreen(),
     );
   }
 }
